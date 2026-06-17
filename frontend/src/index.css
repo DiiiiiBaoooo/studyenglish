@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@500;600;700&display=swap');
+
+:root {
+  --cream: #FFF8EC;
+  --ink: #2E2A26;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--cream);
+  background-image:
+    radial-gradient(circle at 8% 12%, rgba(255,213,107,0.25) 0, transparent 45%),
+    radial-gradient(circle at 92% 18%, rgba(127,209,224,0.25) 0, transparent 40%),
+    radial-gradient(circle at 50% 95%, rgba(255,158,181,0.2) 0, transparent 45%);
+  font-family: 'Quicksand', sans-serif;
+  color: var(--ink);
+}
+
+a {
+  text-decoration: none;
+}
