@@ -5,17 +5,21 @@ import axios from 'axios';
 export default function SetSelection() {
   const [sets, setSets] = useState([]);
 
+  // 🌟 Khai báo biến môi trường giống như bên AdminDashboard
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
   useEffect(() => {
     const fetchSets = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/sets');
+        // 🌟 Cập nhật đường dẫn gọi API
+        const res = await axios.get(`${API_URL}/sets`);
         setSets(res.data);
       } catch (error) {
         console.error('Lỗi khi tải danh sách bộ đề:', error);
       }
     };
     fetchSets();
-  }, []);
+  }, [API_URL]); // Thêm API_URL vào dependency array cho chuẩn React hook
 
   return (
     <div style={{ padding: '40px', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>

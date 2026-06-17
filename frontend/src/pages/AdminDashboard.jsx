@@ -8,6 +8,9 @@ export default function AdminDashboard() {
   const [questions, setQuestions] = useState([]);
   const [newSentence, setNewSentence] = useState(''); 
 
+  // Lấy API URL từ file .env (nếu trên Vercel) hoặc dùng localhost (nếu chạy máy cá nhân)
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
   const handleAddQuestion = () => {
     if (!newSentence.trim()) return;
     
@@ -28,7 +31,8 @@ export default function AdminDashboard() {
     }
 
     try {
-      await axios.post('http://localhost:5000/api/sets', {
+      // 🌟 Đã cập nhật để dùng biến môi trường thay vì localhost
+      await axios.post(`${API_URL}/sets`, {
         title,
         questions
       });

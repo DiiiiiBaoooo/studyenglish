@@ -34,7 +34,9 @@ export default function GameView() {
   useEffect(() => {
     const fetchSet = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/sets/${setId}`);
+        // 🌟 Cập nhật đường dẫn gọi API tại đây
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const res = await axios.get(`${API_URL}/sets/${setId}`);
         setQuestions(shuffleArray(res.data.questions));
       } catch (error) {
         console.error("Lỗi tải bộ đề:", error);
