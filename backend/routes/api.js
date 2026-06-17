@@ -8,7 +8,7 @@ router.get('/sets', async (req, res) => {
     const sets = await QuestionSet.find().select('title description createdAt');
     res.json(sets);
   } catch (err) {
-    res.status(500).json({ error: 'Lỗi server' });
+    res.status(500).json({error:err.message, error: 'Lỗi server' });
   }
 });
 
