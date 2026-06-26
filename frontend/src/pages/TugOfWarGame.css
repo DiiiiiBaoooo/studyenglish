@@ -1,0 +1,515 @@
+/* frontend/src/pages/TugOfWarGame.css */
+
+.tow-stage {
+  max-width: 880px;
+}
+
+/* ---------- Form bits reused for the setup screen ---------- */
+.input-group.small {
+  flex: 1;
+  min-width: 180px;
+}
+
+.input-group label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #6b6258;
+  font-size: 14px;
+}
+
+.tow-admin-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e7dcc0;
+  border-radius: 12px;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2E2A26;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.tow-admin-input:focus {
+  border-color: var(--board-green, #2F6B4F);
+}
+
+/* ---------- Setup screen ---------- */
+.tow-setup-card {
+  background: white;
+  padding: 28px;
+  border-radius: var(--radius-lg, 22px);
+  box-shadow: var(--card-shadow, 0 4px 0 rgba(0,0,0,0.12));
+  border: 2px solid #f0e6d2;
+}
+
+.tow-setup-desc {
+  font-weight: 600;
+  color: #8a8074;
+  margin-bottom: 18px;
+}
+
+.tow-setup-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.tow-setup-rule {
+  background: #fdfaf4;
+  border: 2px dashed #d8c9a3;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b6258;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.tow-setup-rule strong {
+  color: var(--board-green, #2F6B4F);
+}
+
+.tow-start-btn {
+  background: var(--board-green, #2F6B4F);
+  width: 100%;
+  font-size: 19px;
+  padding: 16px;
+}
+
+.tow-setup-footer {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.tow-setup-footer a {
+  color: #8a8074;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* ---------- Top bar ---------- */
+.tow-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 18px 0 16px;
+  flex-wrap: wrap;
+}
+
+.tow-pill-a { color: #C44545 !important; }
+.tow-pill-b { color: #2C6FAE !important; }
+
+.tow-timer-pill {
+  background: var(--board-green, #2F6B4F);
+  color: white;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  border-radius: 999px;
+  padding: 8px 22px;
+  box-shadow: var(--card-shadow, 0 4px 0 rgba(0,0,0,0.12));
+  font-size: 16px;
+  border: 2px solid #1f4d38;
+}
+
+.tow-timer-warning {
+  background: var(--incorrect, #E96A6A);
+  border-color: #a83f3f;
+  animation: tow-timer-pulse 1s infinite;
+}
+
+@keyframes tow-timer-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+/* ---------- Arena (rope) ---------- */
+.tow-arena {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(180deg, #8fd4ea 0%, #c9ecf2 100%);
+  border-radius: var(--radius-lg, 22px);
+  padding: 18px 14px;
+  border: 4px solid #5fb7d1;
+  box-shadow: 0 8px 0 rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.tow-end {
+  flex-shrink: 0;
+  width: 150px;
+  text-align: center;
+}
+
+.tow-kid-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 92px;
+}
+
+.tow-kid-row .tug-kid {
+  width: 48px;
+  height: auto;
+  margin-left: -12px;
+  filter: drop-shadow(0 3px 1px rgba(0,0,0,0.18));
+}
+
+.tow-kid-row .tug-kid:first-child {
+  margin-left: 0;
+}
+
+/* Đội B dùng chung hình vẽ của đội A nhưng lật ngược toàn bộ nhóm,
+   nên tay các bé tự động vươn sang trái để nắm dây mà không cần vẽ thêm bản lật riêng */
+.tow-mirror {
+  transform: scaleX(-1);
+}
+
+.tow-end-label {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: #2E2A26;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Animation: cả nhóm giật dây khi trả lời đúng, mỗi bé lệch nhịp nhẹ tạo hiệu ứng gợn sóng */
+@keyframes tow-pull-kid {
+  0% { transform: translateX(0) rotate(0deg); }
+  35% { transform: translateX(-10px) rotate(-7deg); }
+  70% { transform: translateX(3px) rotate(3deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+.tow-group-pull .tug-kid {
+  animation: tow-pull-kid 0.6s ease;
+}
+.tow-group-pull .tug-kid:nth-child(2) { animation-delay: 0.05s; }
+.tow-group-pull .tug-kid:nth-child(3) { animation-delay: 0.1s; }
+
+/* Animation: cả nhóm lảo đảo khi trả lời sai */
+@keyframes tow-shake-kid {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  20% { transform: translateX(7px) rotate(4deg); }
+  40% { transform: translateX(-7px) rotate(-4deg); }
+  60% { transform: translateX(5px) rotate(2deg); }
+  80% { transform: translateX(-5px) rotate(-2deg); }
+}
+
+.tow-group-shake .tug-kid {
+  animation: tow-shake-kid 0.5s ease;
+}
+
+.tow-track {
+  position: relative;
+  flex: 1;
+  height: 90px;
+  background: linear-gradient(180deg, var(--board-green, #2F6B4F) 0%, var(--board-green-light, #3C8163) 100%);
+  border-radius: var(--radius-md, 16px);
+  border: 3px solid #1f4d38;
+  overflow: hidden;
+}
+
+.tow-tick {
+  position: absolute;
+  top: 50%;
+  width: 3px;
+  height: 26px;
+  background: rgba(255,255,255,0.28);
+  transform: translate(-50%, -50%);
+  border-radius: 2px;
+}
+
+.tow-center-line {
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  bottom: 8%;
+  width: 3px;
+  background: rgba(255,255,255,0.5);
+  transform: translateX(-50%);
+}
+
+.tow-rope-line {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  top: 50%;
+  height: 12px;
+  transform: translateY(-50%);
+  border-radius: 8px;
+  background: repeating-linear-gradient(45deg, #d4a35f 0, #d4a35f 7px, #a87b3c 7px, #a87b3c 14px);
+  box-shadow: 0 3px 0 rgba(0,0,0,0.18);
+}
+
+.tow-knot {
+  position: absolute;
+  top: 50%;
+  font-size: 32px;
+  transform: translate(-50%, -50%);
+  transition: left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 3px 2px rgba(0,0,0,0.3));
+  z-index: 3;
+}
+
+.tow-knot-pulling {
+  animation: tow-knot-bounce 0.6s ease;
+}
+
+@keyframes tow-knot-bounce {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  30% { transform: translate(-50%, -50%) scale(1.35) rotate(-8deg); }
+  60% { transform: translate(-50%, -50%) scale(0.95) rotate(4deg); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* "+1" pop near the team ends */
+.tow-pop {
+  position: absolute;
+  top: 6px;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  opacity: 0;
+  animation: tow-pop-float 0.9s ease forwards;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.tow-pop-a { left: 70px; color: #C44545; }
+.tow-pop-b { right: 70px; color: #2C6FAE; }
+
+@keyframes tow-pop-float {
+  0% { opacity: 0; transform: translateY(0) scale(0.6); }
+  25% { opacity: 1; transform: translateY(-8px) scale(1.15); }
+  100% { opacity: 0; transform: translateY(-38px) scale(1); }
+}
+
+/* ---------- Question card ---------- */
+.tow-question-card {
+  text-align: center;
+  margin: 20px 0 16px;
+  background: white;
+  border-radius: var(--radius-lg, 22px);
+  border: 2px solid #f0e6d2;
+  box-shadow: var(--card-shadow, 0 4px 0 rgba(0,0,0,0.12));
+  padding: 18px 20px;
+}
+
+.tow-qtype-badge {
+  display: inline-block;
+  background: #fdfaf4;
+  border: 1px solid #e7dcc0;
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #9b6b1f;
+  margin-bottom: 10px;
+}
+
+.tow-question-card h3 {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(18px, 3vw, 24px);
+  color: var(--ink, #2E2A26);
+  margin: 0;
+}
+
+/* ---------- Answer panels ---------- */
+.tow-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.tow-panel {
+  background: white;
+  border-radius: var(--radius-lg, 22px);
+  padding: 16px;
+  box-shadow: var(--card-shadow, 0 4px 0 rgba(0,0,0,0.12));
+  transition: opacity 0.2s, border-color 0.2s;
+}
+
+.tow-panel-a { border: 3px solid #f3c8c8; }
+.tow-panel-b { border: 3px solid #c3dcef; }
+
+.tow-panel.tow-locked { opacity: 0.75; }
+
+.tow-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.tow-panel-team {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.tow-panel-status {
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+.tow-panel-status.correct { background: #effaf2; color: var(--correct, #4CAF7D); }
+.tow-panel-status.wrong { background: #fdf0f0; color: var(--incorrect, #E96A6A); }
+
+.tow-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tow-option-btn {
+  width: 100%;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 14px;
+  border-radius: 12px;
+  color: var(--ink, #2E2A26);
+  box-shadow: none;
+  border: 2px solid #e7dcc0;
+}
+
+.tow-option-a {
+  background: #fff7f5;
+}
+.tow-option-a:hover:not(:disabled) {
+  border-color: #C44545;
+}
+
+.tow-option-b {
+  background: #f3faff;
+}
+.tow-option-b:hover:not(:disabled) {
+  border-color: #2C6FAE;
+}
+
+.tow-essay-row {
+  display: flex;
+  gap: 8px;
+}
+
+.tow-essay-input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 2px solid #e7dcc0;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  outline: none;
+}
+
+.tow-essay-input:focus {
+  border-color: var(--board-green, #2F6B4F);
+}
+
+.tow-essay-submit {
+  font-size: 14px;
+  padding: 10px 16px;
+  flex-shrink: 0;
+}
+
+.tow-essay-submit-a { background: #C44545; }
+.tow-essay-submit-b { background: #2C6FAE; }
+
+/* Shake on wrong answer */
+.tow-shake {
+  animation: tow-shake-anim 0.4s ease;
+  border-color: var(--incorrect, #E96A6A) !important;
+  background: #fff8f8;
+}
+
+@keyframes tow-shake-anim {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+/* ---------- Feedback banner ---------- */
+.tow-feedback {
+  text-align: center;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  min-height: 28px;
+  margin-top: 14px;
+}
+
+.tow-feedback.correct { color: var(--correct, #4CAF7D); }
+.tow-feedback.incorrect { color: var(--incorrect, #E96A6A); }
+
+/* ---------- Final screen ---------- */
+.tow-final-screen {
+  text-align: center;
+  padding: 50px 20px;
+  background: white;
+  border-radius: var(--radius-lg, 22px);
+  border: 4px dashed var(--correct, #4CAF7D);
+  box-shadow: var(--card-shadow, 0 4px 0 rgba(0,0,0,0.12));
+  margin-top: 20px;
+}
+
+.tow-trophy {
+  font-size: 56px;
+  margin-bottom: 10px;
+  animation: tow-trophy-bounce 0.8s ease;
+}
+
+@keyframes tow-trophy-bounce {
+  0% { transform: scale(0) rotate(-15deg); }
+  60% { transform: scale(1.2) rotate(8deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.tow-final-screen h2 {
+  font-family: 'Baloo 2', sans-serif;
+  color: var(--board-green, #2F6B4F);
+  font-size: 26px;
+  margin-bottom: 14px;
+}
+
+.tow-final-score {
+  font-weight: 700;
+  font-size: 18px;
+  color: #6b6258;
+  margin-bottom: 24px;
+}
+
+.tow-final-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .tow-panels { grid-template-columns: 1fr; }
+  .tow-end { width: 96px; }
+  .tow-kid-row { height: 64px; }
+  .tow-kid-row .tug-kid { width: 32px; margin-left: -9px; }
+  .tow-arena { padding: 14px 6px; gap: 4px; }
+  .tow-track { height: 76px; }
+  .tow-knot { font-size: 26px; }
+  .tow-pop-a { left: 36px; }
+  .tow-pop-b { right: 36px; }
+}

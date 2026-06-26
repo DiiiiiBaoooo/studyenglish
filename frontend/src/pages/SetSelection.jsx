@@ -60,8 +60,9 @@ export default function SetSelection() {
         )}
       </div>
       
-      <div style={{ marginTop: '50px' }}>
+      <div style={{ marginTop: '50px', display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap' }}>
         <Link to="/admin" style={{ color: '#E8A33D', fontWeight: 'bold' }}>⚙️ Đi đến Trang Quản Trị</Link>
+        <Link to="/tugofwar" style={{ color: '#6A8FE0', fontWeight: 'bold' }}>🪢 Chơi Kéo Co Trả Lời Câu Hỏi</Link>
       </div>
     </div>
   );

@@ -1,0 +1,124 @@
+/* frontend/src/pages/TugOfWarSelection.css */
+
+.tow-select-container {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 40px 20px 60px;
+  font-family: 'Quicksand', sans-serif;
+}
+
+.tow-select-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.tow-select-header h1 {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(28px, 4.5vw, 42px);
+  color: var(--board-green, #2F6B4F);
+  margin: 0 0 6px;
+}
+
+.tow-select-header p {
+  margin: 0;
+  font-weight: 600;
+  color: #6b6258;
+}
+
+.tow-select-header .pencil-divider {
+  width: 140px;
+  height: 6px;
+  margin: 14px auto 0;
+  border-radius: 6px;
+  background: repeating-linear-gradient(90deg, var(--chalk-pink, #FF9EB5) 0 14px, var(--chalk-yellow, #FFD56B) 14px 28px, var(--chalk-blue, #7FD1E0) 28px 42px, var(--chalk-purple, #C6A6E8) 42px 56px);
+}
+
+.tow-select-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.tow-card {
+  display: block;
+  background: white;
+  padding: 22px;
+  border-radius: 22px;
+  border: 2px solid #f0e6d2;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.12);
+  color: var(--ink, #2E2A26);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.tow-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 0 rgba(0,0,0,0.14);
+}
+
+.tow-card-icon {
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+.tow-card-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--board-green, #2F6B4F);
+  margin-bottom: 6px;
+}
+
+.tow-card-desc {
+  font-size: 14px;
+  font-weight: 600;
+  color: #8a8074;
+  margin-bottom: 12px;
+}
+
+.tow-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tow-badge {
+  background: #fdfaf4;
+  border: 1px solid #e7dcc0;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #9b6b1f;
+}
+
+.tow-empty {
+  text-align: center;
+  width: 100%;
+  font-weight: 600;
+  color: #8a8074;
+  grid-column: 1 / -1;
+}
+
+.tow-empty a {
+  color: var(--board-green, #2F6B4F);
+  font-weight: 700;
+}
+
+.tow-select-footer {
+  margin-top: 44px;
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.tow-link-admin {
+  color: #E8A33D;
+  font-weight: 700;
+}
+
+.tow-link-home {
+  color: #6A8FE0;
+  font-weight: 700;
+}
