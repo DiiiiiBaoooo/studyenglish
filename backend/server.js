@@ -7,6 +7,7 @@ const cors = require('cors');
 const apiRoutes = require('./routes/api');
 const tugOfWarRoutes = require('./routes/tugofwar');
 const wordBoardRoutes = require('./routes/wordboard');
+const guessPictureRoutes = require('./routes/guesspicture');
 
 const app = express();
 app.use(cors());
@@ -21,6 +22,7 @@ mongoose.connect(process.env.MONGO_URI)
 app.use('/api', apiRoutes);
 app.use('/api/tugofwar', tugOfWarRoutes);
 app.use('/api/wordboard', wordBoardRoutes);
+app.use('/api/guesspicture', guessPictureRoutes);
 
 // Lấy PORT từ file .env, nếu không có thì mặc định dùng 5000
 const PORT = process.env.PORT || 5000;

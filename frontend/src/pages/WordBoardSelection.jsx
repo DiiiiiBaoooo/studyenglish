@@ -57,6 +57,7 @@ export default function WordBoardSelection() {
         <Link to="/wordboard/admin" className="wb-link-admin">⚙️ Đi đến Trang Quản Trị</Link>
         <Link to="/" className="wb-link-home">📚 Trò chơi Sắp Xếp Câu</Link>
         <Link to="/tugofwar" className="wb-link-tow">🪢 Trò chơi Kéo Co</Link>
+        <Link to="/guesspicture" className="wb-link-tow">🖼️ Trò chơi Nhìn Hình Đoán Từ</Link>
       </div>
     </div>
   );

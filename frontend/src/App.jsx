@@ -8,6 +8,8 @@ import TugOfWarGame from './pages/TugOfWarGame';
 import WordBoardSelection from './pages/WordBoardSelection';
 import WordBoardAdmin from './pages/WordBoardAdmin';
 import WordBoardGame from './pages/WordBoardGame';
+import GuessPictureGame from './pages/GuessPictureGame';
+import GuessPictureAdmin from './pages/GuessPictureAdmin';
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
         <Route path="/wordboard" element={<WordBoardSelection />} />
         <Route path="/wordboard/admin" element={<WordBoardAdmin />} />
         <Route path="/wordboard/play/:setId" element={<WordBoardGame />} />
+        <Route path="/guesspicture" element={<GuessPictureGame />} />
+        <Route path="/guesspicture/admin" element={<GuessPictureAdmin />} />
       </Routes>
     </BrowserRouter>
   );

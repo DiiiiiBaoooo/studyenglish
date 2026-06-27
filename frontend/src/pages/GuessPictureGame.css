@@ -1,0 +1,198 @@
+/* frontend/src/pages/GuessPictureGame.css */
+
+.gp-stage {
+  max-width: 560px;
+}
+
+.gp-setup-card {
+  background: white;
+  padding: 28px 24px;
+  border-radius: var(--radius-lg, 22px);
+  box-shadow: var(--card-shadow, 0 4px 0 rgba(0,0,0,0.12));
+  border: 2px solid #f0e6d2;
+  text-align: center;
+}
+
+.gp-setup-rule {
+  color: #6b6258;
+  font-weight: 600;
+  line-height: 1.6;
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.gp-pool-info {
+  color: #9b6b1f;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.gp-pool-warning {
+  color: var(--incorrect, #E96A6A);
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.gp-pool-warning a,
+.gp-pool-info a {
+  color: var(--board-green, #2F6B4F);
+  text-decoration: underline;
+}
+
+.gp-start-btn {
+  background: var(--board-green, #2F6B4F);
+  font-size: 18px;
+  padding: 14px 32px;
+}
+
+.gp-setup-footer {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.gp-setup-footer a {
+  color: #9b6b1f;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* Top bar */
+.gp-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 18px 0 16px;
+  flex-wrap: wrap;
+}
+
+.gp-timer-pill { color: var(--board-green, #2F6B4F); }
+.gp-timer-warning {
+  color: var(--incorrect, #E96A6A) !important;
+  animation: gp-pulse 1s infinite;
+}
+.gp-wrong-pill { color: var(--incorrect, #E96A6A); }
+.gp-skip-pill { color: #9b6b1f; }
+
+@keyframes gp-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+/* Puzzle: ảnh được chia thành lưới 2x2, mỗi ô hiển thị 1 phần của ảnh gốc
+   nhưng theo thứ tự đã bị xáo trộn (background-position khác vị trí ô) */
+.gp-puzzle-wrap {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.gp-puzzle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 5px;
+  aspect-ratio: 4 / 3;
+  background: #1f4d38;
+  border-radius: var(--radius-lg, 22px);
+  padding: 5px;
+  box-shadow: 0 8px 0 rgba(0,0,0,0.08);
+  border: 4px solid #1f4d38;
+  overflow: hidden;
+}
+
+.gp-puzzle-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.75);
+  font-weight: 700;
+  font-family: 'Baloo 2', sans-serif;
+}
+
+.gp-piece {
+  background-size: 200% 200%;
+  border-radius: 8px;
+  background-color: #e7dcc0;
+}
+
+.gp-shake { animation: gp-shake-kf 0.4s ease; }
+@keyframes gp-shake-kf {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+.gp-hint {
+  text-align: center;
+  margin-top: 14px;
+  color: #a89c86;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.gp-hint-dashes {
+  font-family: 'Baloo 2', sans-serif;
+  letter-spacing: 3px;
+  color: #6b6258;
+  font-size: 17px;
+}
+
+/* Ô nhập đáp án */
+.gp-answer-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.gp-answer-input {
+  flex: 1 1 200px;
+  padding: 12px 18px;
+  border: 2px solid #e7dcc0;
+  border-radius: 999px;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2E2A26;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.gp-answer-input:focus {
+  border-color: var(--board-green, #2F6B4F);
+}
+
+.gp-answer-input:disabled {
+  background: #f6f1e6;
+}
+
+.gp-skip-btn {
+  background: #9b8a72;
+}
+
+.gp-feedback-correct { color: var(--correct, #4CAF7D); }
+.gp-feedback-wrong { color: var(--incorrect, #E96A6A); }
+.gp-feedback-skipped { color: #9b6b1f; }
+
+.gp-trophy {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.gp-final-score {
+  font-weight: 700;
+  color: #6b6258;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 600px) {
+  .gp-puzzle-wrap { max-width: 320px; }
+  .gp-answer-row { flex-direction: column; }
+  .gp-answer-input { flex: 1 1 auto; }
+}

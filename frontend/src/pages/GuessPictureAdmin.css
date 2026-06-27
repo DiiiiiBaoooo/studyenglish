@@ -1,0 +1,149 @@
+/* frontend/src/pages/GuessPictureAdmin.css */
+
+.gp-admin-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px 60px;
+  font-family: 'Quicksand', sans-serif;
+}
+
+.gp-admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.gp-admin-header h2 {
+  font-family: 'Baloo 2', sans-serif;
+  color: var(--board-green, #2F6B4F);
+  font-size: 26px;
+  margin: 0;
+}
+
+.gp-admin-header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.gp-admin-header .btn-home {
+  background: white;
+  color: #6b6258;
+  border: 2px solid #f0e6d2;
+  font-weight: 700;
+}
+
+.gp-admin-card {
+  background: white;
+  padding: 24px;
+  border-radius: 22px;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.12);
+  border: 2px solid #f0e6d2;
+  margin-bottom: 24px;
+}
+
+.gp-admin-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid #e7dcc0;
+  border-radius: 12px;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2E2A26;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.gp-admin-input:focus {
+  border-color: var(--board-green, #2F6B4F);
+}
+
+.gp-file-input {
+  width: 100%;
+  padding: 10px 4px;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 600;
+}
+
+.gp-preview-wrap {
+  margin: 4px 0 18px;
+}
+
+.gp-preview {
+  display: block;
+  width: 240px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 3px solid #f0e6d2;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+}
+
+.gp-form-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-cancel {
+  background: white;
+  color: #9b8a72;
+  border: 2px solid #e7dcc0;
+}
+
+.gp-empty {
+  color: #8a8074;
+  font-weight: 600;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.gp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 16px;
+}
+
+.gp-item-card {
+  background: #fdfaf4;
+  border: 1px solid #e7dcc0;
+  border-radius: 16px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gp-item-thumb {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #efe7d4;
+}
+
+.gp-item-answer {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  color: var(--board-green, #2F6B4F);
+  text-align: center;
+  font-size: 15px;
+  text-transform: capitalize;
+}
+
+.gp-item-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.gp-item-actions button {
+  flex: 1;
+  font-size: 12px;
+  padding: 8px 6px;
+}
+
+.btn-edit {
+  background: #6A8FE0;
+}
