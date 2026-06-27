@@ -12,27 +12,6 @@ const shuffleArray = (arr) => {
   return a;
 };
 
-// Sinh vị trí ngẫu nhiên không chồng chéo
-const generatePositions = (count, bw, bh) => {
-  const W = 130, H = 48, PX = 12, PY = 12;
-  const pos = [];
-  let tries = 0;
-  while (pos.length < count && tries < 3000) {
-    tries++;
-    const x = PX + Math.random() * (bw - W - PX * 2);
-    const y = PY + Math.random() * (bh - H - PY * 2);
-    const rotate = (Math.random() - 0.5) * 10;
-    if (!pos.some(p => Math.abs(p.x - x) < W + 10 && Math.abs(p.y - y) < H + 10))
-      pos.push({ x, y, rotate });
-  }
-  // fallback lưới nếu không đủ chỗ
-  while (pos.length < count) {
-    const col = pos.length % 4, row = Math.floor(pos.length / 4);
-    pos.push({ x: PX + col * (W + 10), y: PY + row * (H + 12), rotate: (Math.random() - 0.5) * 5 });
-  }
-  return pos;
-};
-
 export default function WordBoardGame() {
   const { setId } = useParams();
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -45,8 +24,7 @@ export default function WordBoardGame() {
   const [timeLeft, setTimeLeft] = useState(180);
 
   const [activeTopic, setActiveTopic] = useState(null);
-  // board: { id, word, topicIdx, found, pos }
-  // found lưu tên topic đã chọn đúng để tô màu riêng
+  // board: { id, word, topicIdx, found, rotate }
   const [board, setBoard] = useState([]);
   const [score, setScore] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
@@ -54,9 +32,6 @@ export default function WordBoardGame() {
   const [roundsCleared, setRoundsCleared] = useState(0);
   const [correctFlash, setCorrectFlash] = useState(null); // id vừa chọn đúng
 
-  const boardRef = useRef(null);
-  const topicQueueRef = useRef([]);
-  const topicPosRef = useRef(0);
   const idCnt = useRef(0);
   const wrongTimer = useRef(null);
   const flashTimer = useRef(null);
@@ -83,88 +58,74 @@ export default function WordBoardGame() {
     clearTimeout(nextTopicTimer.current);
   }, []);
 
-  // Lấy chủ đề tiếp theo (shuffle luân phiên)
-  const pickNextTopic = useCallback((topics) => {
-    if (topicPosRef.current >= topicQueueRef.current.length) {
-      topicQueueRef.current = shuffleArray(topics.map((_, i) => i));
-      topicPosRef.current = 0;
-    }
-    return topicQueueRef.current[topicPosRef.current++];
-  }, []);
-
-  // Xây bảng mới: mỗi topic góp 1 từ, tổng = wordsPerBoard
+  // Xây bảng mới: N từ cố định, trộn từ tất cả chủ đề (ưu tiên mỗi chủ đề góp ít nhất 1 từ)
   const buildBoard = useCallback((topics, perBoard) => {
-    const boardEl = boardRef.current;
-    const bw = boardEl ? boardEl.offsetWidth : 680;
-    const bh = boardEl ? boardEl.offsetHeight : 420;
-
-    // Mỗi topic 1 từ đại diện (shuffle nội bộ)
+    const topicOrder = shuffleArray(topics.map((_, i) => i));
+    const used = new Set();
     const slots = [];
-    topics.forEach((t, ti) => {
-      const word = shuffleArray(t.words)[0];
-      if (word) slots.push({ word, topicIdx: ti });
-    });
 
-    // Thêm từ nhiễu từ các topic (chọn ngẫu nhiên) cho đủ perBoard
-    const allWords = topics.flatMap((t, ti) => t.words.map(w => ({ word: w, topicIdx: ti })));
-    const used = new Set(slots.map(s => s.word));
-    const extras = shuffleArray(allWords.filter(w => !used.has(w.word)));
-    let i = 0;
-    while (slots.length < perBoard && i < extras.length) {
-      slots.push(extras[i++]);
+    // Bước 1: lấy 1 từ đại diện mỗi chủ đề (xoay vòng ngẫu nhiên các chủ đề) cho tới khi đủ N
+    for (const ti of topicOrder) {
+      if (slots.length >= perBoard) break;
+      const candidates = shuffleArray(topics[ti].words || []);
+      const word = candidates.find(w => !used.has(w));
+      if (word) { slots.push({ word, topicIdx: ti }); used.add(word); }
     }
 
-    const shuffled = shuffleArray(slots);
-    const positions = generatePositions(shuffled.length, bw, bh);
-    return shuffled.map((s, idx) => ({
+    // Bước 2: nếu chưa đủ N, lấy thêm từ ngẫu nhiên (có thể trùng chủ đề) cho đủ
+    if (slots.length < perBoard) {
+      const allWords = topics.flatMap((t, ti) => (t.words || []).map(w => ({ word: w, topicIdx: ti })));
+      const extras = shuffleArray(allWords.filter(w => !used.has(w.word)));
+      let i = 0;
+      while (slots.length < perBoard && i < extras.length) {
+        const cand = extras[i++];
+        if (!used.has(cand.word)) { slots.push(cand); used.add(cand.word); }
+      }
+    }
+
+    const final = shuffleArray(slots).slice(0, perBoard);
+    return final.map(s => ({
       id: ++idCnt.current,
       word: s.word,
       topicIdx: s.topicIdx,
-      found: false,       // false = chưa tìm, hoặc topicIdx khi đã tìm đúng
-      pos: positions[idx] || { x: 10, y: 10, rotate: 0 },
+      found: false,
+      rotate: (Math.random() - 0.5) * 6, // nghiêng nhẹ cho sinh động, không phá vỡ bố cục lưới
     }));
+  }, []);
+
+  // Chọn 1 chủ đề còn từ chưa khoanh trên bảng (tránh lặp lại đúng chủ đề vừa hỏi nếu còn lựa chọn khác)
+  const pickAvailableTopic = useCallback((currentBoard, topics, avoidIdx) => {
+    const unfound = currentBoard.filter(b => !b.found);
+    if (unfound.length === 0) return null; // tất cả đã khoanh hết → báo hiệu cần bảng mới
+
+    const distinctIdx = new Set(unfound.map(b => b.topicIdx));
+    let pool = unfound;
+    if (avoidIdx != null && distinctIdx.size > 1) {
+      pool = unfound.filter(b => b.topicIdx !== avoidIdx);
+    }
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    return { ...topics[pick.topicIdx], idx: pick.topicIdx };
   }, []);
 
   const startGame = () => {
     if (!setData?.topics?.length) { alert('Bộ đề chưa có chủ đề!'); return; }
     if (!setData.topics.some(t => t.words?.length)) { alert('Chưa có từ nào!'); return; }
 
-    topicQueueRef.current = [];
-    topicPosRef.current = 0;
     setScore(0); setWrongCount(0); setRoundsCleared(0);
     setWrongId(null); setCorrectFlash(null);
     setTimeLeft(Number(duration) || 180);
 
     const newBoard = buildBoard(setData.topics, setData.wordsPerBoard || 10);
     setBoard(newBoard);
-
-    const tIdx = pickNextTopic(setData.topics);
-    setActiveTopic({ ...setData.topics[tIdx], idx: tIdx });
+    setActiveTopic(pickAvailableTopic(newBoard, setData.topics, null));
     setPhase('playing');
   };
-
-  // Đổi sang chủ đề tiếp theo (không rebuild bảng)
-  const advanceTopic = useCallback((currentBoard, topics) => {
-    // Kiểm tra còn từ nào chưa tìm của các topic khác không
-    const foundTopics = new Set(currentBoard.filter(b => b.found).map(b => b.topicIdx));
-
-    // Còn topic nào chưa có từ được tìm không?
-    const remaining = topics.filter((_, i) => !foundTopics.has(i) && currentBoard.some(b => b.topicIdx === i && !b.found));
-
-    if (remaining.length === 0) {
-      // Hết tất cả → build bảng mới
-      return null; // signal rebuild
-    }
-
-    const tIdx = pickNextTopic(topics);
-    return { ...topics[tIdx], idx: tIdx };
-  }, [pickNextTopic]);
 
   const handleWordClick = (item) => {
     if (phase !== 'playing' || item.found) return;
 
     if (item.topicIdx === activeTopic.idx) {
-      // Đúng!
+      // Đúng! → khoanh tròn từ này, giữ nguyên bảng
       const newBoard = board.map(b => b.id === item.id ? { ...b, found: true } : b);
       setBoard(newBoard);
       setScore(s => s + 1);
@@ -172,16 +133,15 @@ export default function WordBoardGame() {
       clearTimeout(flashTimer.current);
       flashTimer.current = setTimeout(() => setCorrectFlash(null), 800);
 
-      // Đổi chủ đề sau 600ms
+      // Đổi sang chủ đề khác sau 1 nhịp ngắn
       clearTimeout(nextTopicTimer.current);
       nextTopicTimer.current = setTimeout(() => {
-        const next = advanceTopic(newBoard, setData.topics);
+        const next = pickAvailableTopic(newBoard, setData.topics, activeTopic.idx);
         if (next === null) {
-          // Rebuild bảng mới
+          // Tất cả từ trên bảng đã bị khoanh hết → load bảng từ mới
           const nb = buildBoard(setData.topics, setData.wordsPerBoard || 10);
           setBoard(nb);
-          const tIdx = pickNextTopic(setData.topics);
-          setActiveTopic({ ...setData.topics[tIdx], idx: tIdx });
+          setActiveTopic(pickAvailableTopic(nb, setData.topics, null));
           setRoundsCleared(r => r + 1);
         } else {
           setActiveTopic(next);
@@ -238,9 +198,10 @@ export default function WordBoardGame() {
               value={duration} onChange={e => setDuration(e.target.value)} />
           </div>
           <p className="wb-setup-rule">
-            📜 Luật chơi: Bảng đen hiện các từ. Phía trên hiện <strong>1 chủ đề</strong> — hãy tìm
-            và bấm đúng từ thuộc chủ đề đó. Chọn đúng → giữ nguyên bảng, đổi sang chủ đề khác.
-            Chọn hết tất cả → bảng mới. Cố gắng trong <strong>{duration}s</strong>!
+            📜 Luật chơi: Bảng đen hiện <strong>{setData.wordsPerBoard || 10} từ cố định</strong> trộn từ mọi chủ đề.
+            Phía trên hiện <strong>1 chủ đề</strong> — hãy tìm và bấm đúng từ thuộc chủ đề đó để khoanh tròn lại.
+            Chọn đúng → bảng giữ nguyên, chỉ đổi sang chủ đề khác. Khi <strong>tất cả từ trên bảng đã được khoanh hết</strong>
+            → mới chuyển sang bảng từ mới. Cố gắng trong <strong>{duration}s</strong>!
           </p>
           <button className="wb-start-btn" onClick={startGame}>🚀 Bắt Đầu Chơi!</button>
           <div className="wb-setup-footer"><Link to="/wordboard">⬅️ Chọn bộ đề khác</Link></div>
@@ -264,7 +225,7 @@ export default function WordBoardGame() {
           </div>
 
           {/* BẢNG ĐEN */}
-          <div className="wb-chalkboard" ref={boardRef}>
+          <div className="wb-chalkboard">
             <div className="wb-chalk-frame">
               <div className="wb-chalk-surface">
                 {board.map(item => {
@@ -281,16 +242,13 @@ export default function WordBoardGame() {
                         correctFlash === item.id ? 'wb-chalk-correct' : '',
                       ].join(' ')}
                       style={{
-                        left: item.pos.x,
-                        top: item.pos.y,
-                        transform: `rotate(${item.pos.rotate}deg)`,
-                        '--r': `${item.pos.rotate}deg`,
+                        '--r': `${item.rotate}deg`,
                         '--found-color': foundColor,
                       }}
                       onClick={() => handleWordClick(item)}
                       disabled={item.found}
                     >
-                      {item.word}
+                      <span className="wb-chalk-word-text">{item.word}</span>
                       {item.found && <span className="wb-chalk-circle" />}
                     </button>
                   );
@@ -302,7 +260,9 @@ export default function WordBoardGame() {
           {/* Legend topics */}
           <div className="wb-legend">
             {setData.topics.map((t, i) => {
-              const isDone = board.some(b => b.topicIdx === i && b.found);
+              const onBoard = board.some(b => b.topicIdx === i);
+              if (!onBoard) return null;
+              const isDone = !board.some(b => b.topicIdx === i && !b.found);
               return (
                 <span key={i} className={`wb-legend-chip ${activeTopic.idx === i ? 'wb-legend-active' : ''} ${isDone ? 'wb-legend-done' : ''}`}
                   style={{ '--chip-color': TOPIC_COLORS[i % TOPIC_COLORS.length] }}>
