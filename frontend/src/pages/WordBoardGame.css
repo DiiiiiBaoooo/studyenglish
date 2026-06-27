@@ -1,294 +1,185 @@
-/* frontend/src/pages/WordBoardGame.css */
+/* WordBoardGame.css */
 
-.wb-stage {
-  max-width: 900px;
-}
+.wb-stage { max-width: 960px; }
 
-/* ---------- Form bits (tự chứa, không phụ thuộc file CSS khác) ---------- */
-.input-group.small {
-  max-width: 260px;
-}
-
-.input-group label {
-  display: block;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: #6b6258;
-  font-size: 14px;
-}
-
+/* Form */
+.input-group.small { max-width: 260px; }
+.input-group label { display:block; font-weight:700; margin-bottom:8px; color:#6b6258; font-size:14px; }
 .wb-admin-input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e7dcc0;
-  border-radius: 12px;
-  font-family: 'Quicksand', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  color: #2E2A26;
-  outline: none;
-  transition: border-color 0.2s;
+  width:100%; padding:12px 16px; border:2px solid #e7dcc0; border-radius:12px;
+  font-family:'Quicksand',sans-serif; font-size:16px; font-weight:600; color:#2E2A26; outline:none;
+  transition:border-color .2s;
 }
+.wb-admin-input:focus { border-color:#2F6B4F; }
 
-.wb-admin-input:focus {
-  border-color: var(--board-green, #2F6B4F);
-}
-
-/* ---------- Setup screen ---------- */
-.wb-setup-card {
-  background: white;
-  padding: 28px;
-  border-radius: var(--radius-lg, 22px);
-  box-shadow: var(--card-shadow, 0 4px 0 rgba(0,0,0,0.12));
-  border: 2px solid #f0e6d2;
-}
-
-.wb-setup-desc {
-  font-weight: 600;
-  color: #8a8074;
-  margin-bottom: 18px;
-}
-
+/* Setup */
+.wb-setup-card { background:white; padding:28px; border-radius:22px; box-shadow:0 4px 0 rgba(0,0,0,.12); border:2px solid #f0e6d2; }
+.wb-setup-desc { font-weight:600; color:#8a8074; margin-bottom:18px; }
 .wb-setup-rule {
-  background: #fdfaf4;
-  border: 2px dashed #d8c9a3;
-  border-radius: 14px;
-  padding: 14px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #6b6258;
-  line-height: 1.6;
-  margin: 18px 0 20px;
+  background:#fdfaf4; border:2px dashed #d8c9a3; border-radius:14px;
+  padding:14px 16px; font-size:14px; font-weight:600; color:#6b6258; line-height:1.6; margin:18px 0 20px;
+}
+.wb-setup-rule strong { color:#2F6B4F; }
+.wb-start-btn { background:#2F6B4F; width:100%; font-size:19px; padding:16px; }
+.wb-setup-footer { text-align:center; margin-top:16px; }
+.wb-setup-footer a { color:#8a8074; font-weight:700; font-size:14px; }
+
+/* Topbar */
+.wb-topbar { display:flex; align-items:center; justify-content:center; gap:10px; margin:14px 0 12px; flex-wrap:wrap; }
+.wb-timer-pill  { background:#2F6B4F; color:#fff; }
+.wb-score-pill  { background:#2F6B4F; color:#fff; }
+.wb-wrong-pill  { background:#b91c1c; color:#fff; }
+.wb-progress-pill { background:#4b5563; color:#fff; }
+
+/* Topic banner */
+.wb-topic-banner { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+.wb-topic-label { font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:#6b6258; }
+.wb-topic-name {
+  font-family:'Baloo 2',sans-serif; font-size:22px; font-weight:800; color:#1e3a2f;
+  background:#fef9c3; border:2.5px solid #fbbf24; border-radius:12px; padding:4px 22px;
+  display:inline-block;
+  animation:wb-pop .35s ease;
+}
+@keyframes wb-pop {
+  0%   { transform:scale(.82) rotate(-2deg); opacity:.3; }
+  65%  { transform:scale(1.07) rotate(1deg); }
+  100% { transform:scale(1) rotate(0); opacity:1; }
 }
 
-.wb-setup-rule strong {
-  color: var(--board-green, #2F6B4F);
+/* ===== BẢNG ĐEN ===== */
+.wb-chalkboard {
+  width:100%; aspect-ratio:3/2; max-height:460px;
+  position:relative; border-radius:6px;
+  /* viền gỗ */
+  box-shadow: 0 0 0 16px #c0832e, 0 0 0 18px #7a4a10, 0 10px 36px rgba(0,0,0,.5);
+  margin:0 auto 16px;
 }
 
-.wb-start-btn {
-  background: var(--board-green, #2F6B4F);
-  width: 100%;
-  font-size: 19px;
-  padding: 16px;
+.wb-chalk-frame {
+  position:absolute; inset:0; border-radius:6px;
+  background:
+    repeating-linear-gradient(90deg, transparent, transparent 22px, rgba(255,255,255,.02) 22px, rgba(255,255,255,.02) 23px),
+    linear-gradient(155deg,#c8882e 0%,#9a5c18 45%,#c8882e 65%,#8a5010 100%);
+  padding:16px; box-sizing:border-box;
 }
 
-.wb-setup-footer {
-  text-align: center;
-  margin-top: 16px;
+.wb-chalk-surface {
+  position:relative; width:100%; height:100%; border-radius:3px; overflow:hidden;
+  background:
+    radial-gradient(ellipse at 15% 85%, rgba(255,255,255,.04) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 15%, rgba(255,255,255,.03) 0%, transparent 45%),
+    #2a5236;
+}
+.wb-chalk-surface::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(45deg, transparent, transparent 80px, rgba(255,255,255,.006) 80px, rgba(255,255,255,.006) 81px);
 }
 
-.wb-setup-footer a {
-  color: #8a8074;
-  font-weight: 700;
-  font-size: 14px;
+/* ===== TỪ TRÊN BẢNG ===== */
+.wb-chalk-word {
+  position:absolute;
+  font-family:'Caveat','Baloo 2',cursive,sans-serif;
+  font-size:clamp(15px, 1.9vw, 22px);
+  font-weight:700;
+  color:rgba(255,255,255,.9);
+  background:none; border:none; cursor:pointer;
+  padding:5px 10px; border-radius:4px;
+  white-space:nowrap; user-select:none; line-height:1.25;
+  transition:color .15s, text-shadow .15s, transform .12s, opacity .2s;
+  /* gạch chân nhẹ giống nét phấn */
+  text-shadow: 0 0 8px rgba(255,255,255,.12), 1px 1px 0 rgba(0,0,0,.2);
+}
+.wb-chalk-word::after {
+  content:''; position:absolute; bottom:3px; left:8px; right:8px;
+  height:1.5px; background:rgba(255,255,255,.2); border-radius:1px;
 }
 
-/* ---------- Top bar ---------- */
-.wb-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  margin: 18px 0 16px;
-  flex-wrap: wrap;
+.wb-chalk-word:hover:not(:disabled):not(.wb-chalk-found) {
+  color:#fff;
+  text-shadow: 0 0 10px rgba(255,255,255,.8), 0 0 22px rgba(255,255,255,.35), 1px 1px 0 rgba(0,0,0,.2);
+  transform:scale(1.1) rotate(0deg) !important;
 }
 
-.wb-timer-pill {
-  background: var(--board-green, #2F6B4F);
-  color: white;
+/* Đã tìm đúng → màu riêng từng topic */
+.wb-chalk-found {
+  color: var(--found-color, #7effa0) !important;
+  text-shadow: 0 0 12px color-mix(in srgb, var(--found-color, #7effa0) 60%, transparent) !important;
+  cursor:default; opacity:.75;
 }
 
-/* ---------- Hàng chủ đề ---------- */
-.wb-topics-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 14px;
+/* Vòng tròn tay vẽ */
+.wb-chalk-circle {
+  position:absolute; inset:-9px -14px; display:block; pointer-events:none;
+  border:2.5px solid var(--found-color, #7effa0);
+  border-radius:52% 48% 50% 52% / 50% 52% 48% 50%;
+  animation:wb-ring .45s ease forwards;
+  opacity:.85;
+}
+@keyframes wb-ring {
+  from { transform:scale(.4); opacity:0; }
+  65%  { transform:scale(1.18); opacity:1; }
+  to   { transform:scale(1); opacity:.85; }
 }
 
-.wb-topic-chip {
-  background: white;
-  border: 2px solid #e7dcc0;
-  color: #8a8074;
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 700;
-  font-size: 13px;
-  padding: 6px 16px;
-  border-radius: 999px;
-  transition: all 0.25s ease;
+/* Flash xanh khi vừa chọn đúng */
+.wb-chalk-correct {
+  color:#fff !important;
+  text-shadow: 0 0 16px rgba(100,255,160,.9), 0 0 30px rgba(100,255,160,.5) !important;
+  transform:scale(1.18) rotate(0deg) !important;
 }
 
-.wb-topic-active {
-  background: var(--chalk-yellow, #FFD56B);
-  border-color: #e0ad2e;
-  color: #6b4a12;
-  transform: scale(1.12);
-  box-shadow: 0 3px 0 rgba(0,0,0,0.12);
-  animation: wb-topic-pop 0.4s ease;
+/* Rung đỏ khi sai */
+@keyframes wb-shake {
+  0%,100% { transform:translateX(0) rotate(var(--r,0deg)); }
+  20%      { transform:translateX(-7px) rotate(var(--r,0deg)); }
+  45%      { transform:translateX(7px) rotate(var(--r,0deg)); }
+  65%      { transform:translateX(-4px) rotate(var(--r,0deg)); }
+  82%      { transform:translateX(4px) rotate(var(--r,0deg)); }
+}
+.wb-chalk-wrong {
+  animation:wb-shake .42s ease !important;
+  color:#ff7070 !important;
+  text-shadow:0 0 10px rgba(255,80,80,.6) !important;
 }
 
-@keyframes wb-topic-pop {
-  0% { transform: scale(0.85); }
-  60% { transform: scale(1.2); }
-  100% { transform: scale(1.12); }
+/* ===== LEGEND ===== */
+.wb-legend {
+  display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:4px 0 8px;
+}
+.wb-legend-chip {
+  font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:700;
+  padding:5px 14px; border-radius:99px;
+  background:rgba(255,255,255,.08); border:1.5px solid rgba(255,255,255,.15);
+  color:#9ca3af; transition:all .25s;
+}
+.wb-legend-active {
+  background:#fef9c3; border-color:#fbbf24; color:#78350f;
+  transform:scale(1.08); box-shadow:0 2px 0 rgba(0,0,0,.1);
+}
+.wb-legend-done {
+  background: color-mix(in srgb, var(--chip-color) 18%, white);
+  border-color: color-mix(in srgb, var(--chip-color) 60%, white);
+  color: color-mix(in srgb, var(--chip-color) 50%, #1a1a1a);
+  opacity:.7;
 }
 
-.wb-instruction {
-  text-align: center;
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 17px;
-  color: var(--ink, #2E2A26);
-  margin-bottom: 16px;
-}
-
-.wb-instruction strong {
-  color: var(--board-green, #2F6B4F);
-}
-
-/* ---------- Bảng từ ---------- */
-.wb-board {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 14px;
-}
-
-.wb-card {
-  position: relative;
-  background: white;
-  border: 2px solid #e7dcc0;
-  border-radius: 16px;
-  padding: 18px 10px;
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 700;
-  font-size: 16px;
-  color: var(--ink, #2E2A26);
-  box-shadow: 0 4px 0 rgba(0,0,0,0.1);
-  transition: transform 0.12s ease;
-  min-height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.wb-card:hover:not(:disabled) {
-  transform: translateY(-3px);
-  border-color: var(--board-green, #2F6B4F);
-}
-
-.wb-card:disabled {
-  cursor: default;
-}
-
-.wb-word {
-  position: relative;
-  z-index: 1;
-}
-
-.wb-found {
-  background: #f4fbf6;
-  border-color: var(--correct, #4CAF7D);
-}
-
-.wb-found .wb-word {
-  color: #2f7a52;
-}
-
-/* Hiệu ứng khoanh tròn tay vẽ khi chọn đúng */
-.wb-circle-svg {
-  position: absolute;
-  inset: -6px;
-  width: calc(100% + 12px);
-  height: calc(100% + 12px);
-  pointer-events: none;
-  overflow: visible;
-}
-
-.wb-circle-path {
-  fill: none;
-  stroke: #FF6B4A;
-  stroke-width: 7;
-  stroke-linecap: round;
-  stroke-dasharray: 460;
-  stroke-dashoffset: 460;
-  animation: wb-draw-circle 0.45s ease forwards;
-}
-
-@keyframes wb-draw-circle {
-  to { stroke-dashoffset: 0; }
-}
-
-/* Lảo đảo + đỏ khi chọn sai */
-@keyframes wb-shake-anim {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-7px); }
-  40% { transform: translateX(7px); }
-  60% { transform: translateX(-4px); }
-  80% { transform: translateX(4px); }
-}
-
-.wb-wrong {
-  animation: wb-shake-anim 0.4s ease;
-  border-color: var(--incorrect, #E96A6A) !important;
-  background: #fff5f5;
-}
-
-/* ---------- Final screen ---------- */
+/* Final */
 .wb-final-screen {
-  text-align: center;
-  padding: 50px 20px;
-  background: white;
-  border-radius: var(--radius-lg, 22px);
-  border: 4px dashed var(--correct, #4CAF7D);
-  box-shadow: var(--card-shadow, 0 4px 0 rgba(0,0,0,0.12));
-  margin-top: 20px;
+  text-align:center; padding:50px 20px; background:white; border-radius:22px;
+  border:4px dashed #4CAF7D; box-shadow:0 4px 0 rgba(0,0,0,.12); margin-top:20px;
 }
-
-.wb-trophy {
-  font-size: 56px;
-  margin-bottom: 10px;
-  animation: wb-trophy-bounce 0.8s ease;
-}
-
+.wb-trophy { font-size:56px; margin-bottom:10px; animation:wb-trophy-bounce .8s ease; }
 @keyframes wb-trophy-bounce {
-  0% { transform: scale(0) rotate(-15deg); }
-  60% { transform: scale(1.2) rotate(8deg); }
-  100% { transform: scale(1) rotate(0); }
+  0%   { transform:scale(0) rotate(-15deg); }
+  60%  { transform:scale(1.2) rotate(8deg); }
+  100% { transform:scale(1) rotate(0); }
 }
+.wb-final-screen h2 { font-family:'Baloo 2',sans-serif; color:#2F6B4F; font-size:26px; margin-bottom:14px; }
+.wb-final-score { font-weight:700; font-size:15px; color:#6b6258; margin-bottom:24px; line-height:1.8; }
+.wb-final-actions { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
 
-.wb-final-screen h2 {
-  font-family: 'Baloo 2', sans-serif;
-  color: var(--board-green, #2F6B4F);
-  font-size: 26px;
-  margin-bottom: 14px;
-}
-
-.wb-final-score {
-  font-weight: 700;
-  font-size: 15px;
-  color: #6b6258;
-  margin-bottom: 24px;
-  line-height: 1.8;
-}
-
-.wb-final-actions {
-  display: flex;
-  justify-content: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-/* ---------- Responsive ---------- */
-@media (max-width: 720px) {
-  .wb-board {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 420px) {
-  .wb-topic-chip {
-    font-size: 11px;
-    padding: 5px 12px;
-  }
+/* Responsive */
+@media (max-width:600px) {
+  .wb-chalkboard { aspect-ratio:4/3; }
+  .wb-chalk-word { font-size:13px; }
 }
