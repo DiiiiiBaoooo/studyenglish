@@ -55,7 +55,8 @@ export default function TugOfWarSelection() {
 
       <div className="tow-select-footer">
         <Link to="/tugofwar/admin" className="tow-link-admin">⚙️ Đi đến Trang Quản Trị Kéo Co</Link>
-        <Link to="/" className="tow-link-home">📚 Quay lại trò chơi Sắp Xếp Câu</Link>
+        <Link to="/" className="tow-link-home">📚 Trò chơi Sắp Xếp Câu</Link>
+        <Link to="/wordboard" className="tow-link-home">🎯 Trò chơi Chọn Từ Theo Chủ Đề</Link>
       </div>
     </div>
   );

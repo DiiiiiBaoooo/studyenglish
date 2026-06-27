@@ -63,6 +63,7 @@ export default function SetSelection() {
       <div style={{ marginTop: '50px', display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap' }}>
         <Link to="/admin" style={{ color: '#E8A33D', fontWeight: 'bold' }}>⚙️ Đi đến Trang Quản Trị</Link>
         <Link to="/tugofwar" style={{ color: '#6A8FE0', fontWeight: 'bold' }}>🪢 Chơi Kéo Co Trả Lời Câu Hỏi</Link>
+        <Link to="/wordboard" style={{ color: '#9b6b1f', fontWeight: 'bold' }}>🎯 Chơi Chọn Từ Theo Chủ Đề</Link>
       </div>
     </div>
   );

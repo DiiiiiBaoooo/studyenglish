@@ -1,0 +1,110 @@
+/* frontend/src/pages/WordBoardSelection.css */
+
+.wb-select-container {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 40px 20px 60px;
+  font-family: 'Quicksand', sans-serif;
+}
+
+.wb-select-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.wb-select-header h1 {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(28px, 4.5vw, 42px);
+  color: var(--board-green, #2F6B4F);
+  margin: 0 0 6px;
+}
+
+.wb-select-header p {
+  margin: 0;
+  font-weight: 600;
+  color: #6b6258;
+}
+
+.wb-select-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.wb-card-link {
+  display: block;
+  background: white;
+  padding: 22px;
+  border-radius: 22px;
+  border: 2px solid #f0e6d2;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.12);
+  color: var(--ink, #2E2A26);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.wb-card-link:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 0 rgba(0,0,0,0.14);
+}
+
+.wb-card-icon {
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+.wb-card-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--board-green, #2F6B4F);
+  margin-bottom: 6px;
+}
+
+.wb-card-desc {
+  font-size: 14px;
+  font-weight: 600;
+  color: #8a8074;
+  margin-bottom: 12px;
+}
+
+.wb-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wb-badge {
+  background: #fdfaf4;
+  border: 1px solid #e7dcc0;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #9b6b1f;
+}
+
+.wb-empty {
+  text-align: center;
+  width: 100%;
+  font-weight: 600;
+  color: #8a8074;
+  grid-column: 1 / -1;
+}
+
+.wb-empty a {
+  color: var(--board-green, #2F6B4F);
+  font-weight: 700;
+}
+
+.wb-select-footer {
+  margin-top: 44px;
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.wb-link-admin { color: #E8A33D; font-weight: 700; }
+.wb-link-home { color: #6A8FE0; font-weight: 700; }
+.wb-link-tow { color: #C44545; font-weight: 700; }

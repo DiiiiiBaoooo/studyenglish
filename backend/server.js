@@ -6,6 +6,7 @@ const cors = require('cors');
 // Import routes
 const apiRoutes = require('./routes/api');
 const tugOfWarRoutes = require('./routes/tugofwar');
+const wordBoardRoutes = require('./routes/wordboard');
 
 const app = express();
 app.use(cors());
@@ -19,6 +20,7 @@ mongoose.connect(process.env.MONGO_URI)
 // Sử dụng Routes
 app.use('/api', apiRoutes);
 app.use('/api/tugofwar', tugOfWarRoutes);
+app.use('/api/wordboard', wordBoardRoutes);
 
 // Lấy PORT từ file .env, nếu không có thì mặc định dùng 5000
 const PORT = process.env.PORT || 5000;

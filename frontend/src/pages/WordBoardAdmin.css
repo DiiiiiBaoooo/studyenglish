@@ -1,0 +1,163 @@
+/* frontend/src/pages/WordBoardAdmin.css */
+
+.wb-admin-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px 60px;
+  font-family: 'Quicksand', sans-serif;
+}
+
+.wb-admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.wb-admin-header h2 {
+  font-family: 'Baloo 2', sans-serif;
+  color: var(--board-green, #2F6B4F);
+  font-size: 26px;
+  margin: 0;
+}
+
+.wb-admin-header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.wb-admin-header .btn-home {
+  background: white;
+  color: #6b6258;
+  border: 2px solid #f0e6d2;
+  font-weight: 700;
+}
+
+.wb-admin-card {
+  background: white;
+  padding: 24px;
+  border-radius: 22px;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.12);
+  border: 2px solid #f0e6d2;
+  margin-bottom: 24px;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group.small {
+  flex: 1;
+  min-width: 200px;
+}
+
+.input-group label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #6b6258;
+}
+
+.section-label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: #6b6258;
+  font-size: 16px;
+}
+
+.wb-admin-input,
+.wb-admin-textarea {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid #e7dcc0;
+  border-radius: 12px;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2E2A26;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.wb-admin-textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.wb-admin-input:focus,
+.wb-admin-textarea:focus {
+  border-color: var(--board-green, #2F6B4F);
+}
+
+.wb-settings-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-add-topic {
+  background: #6A8FE0;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.topic-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.topic-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  background: #f9f5ed;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 1px solid #e7dcc0;
+}
+
+.topic-item-info strong {
+  color: var(--board-green, #2F6B4F);
+  font-size: 15px;
+}
+
+.topic-word-count {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #9b6b1f;
+  background: #fdfaf4;
+  border: 1px solid #e7dcc0;
+  border-radius: 999px;
+  padding: 2px 9px;
+}
+
+.topic-word-preview {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #8a8074;
+  line-height: 1.5;
+}
+
+.btn-delete {
+  background: var(--incorrect, #E96A6A);
+  padding: 8px 16px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.btn-save {
+  background: var(--correct, #4CAF7D);
+  width: 100%;
+  font-size: 18px;
+  padding: 14px;
+}

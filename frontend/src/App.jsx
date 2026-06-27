@@ -5,6 +5,9 @@ import GameView from './pages/GameView';
 import TugOfWarSelection from './pages/TugOfWarSelection';
 import TugOfWarAdmin from './pages/TugOfWarAdmin';
 import TugOfWarGame from './pages/TugOfWarGame';
+import WordBoardSelection from './pages/WordBoardSelection';
+import WordBoardAdmin from './pages/WordBoardAdmin';
+import WordBoardGame from './pages/WordBoardGame';
 
 function App() {
   return (
@@ -16,6 +19,9 @@ function App() {
         <Route path="/tugofwar" element={<TugOfWarSelection />} />
         <Route path="/tugofwar/admin" element={<TugOfWarAdmin />} />
         <Route path="/tugofwar/play/:setId" element={<TugOfWarGame />} />
+        <Route path="/wordboard" element={<WordBoardSelection />} />
+        <Route path="/wordboard/admin" element={<WordBoardAdmin />} />
+        <Route path="/wordboard/play/:setId" element={<WordBoardGame />} />
       </Routes>
     </BrowserRouter>
   );
