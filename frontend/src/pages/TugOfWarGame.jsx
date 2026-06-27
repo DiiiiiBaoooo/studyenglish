@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import TugKid from '../components/TugKid';
 import './TugOfWarGame.css';
 
 const shuffleArray = (array) => {
@@ -11,6 +10,13 @@ const shuffleArray = (array) => {
     [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
   }
   return newArr;
+};
+
+const checkAnswer = (question, rawAnswer) => {
+  if (question.type === 'multiple_choice') {
+    return rawAnswer === question.correctAnswer;
+  }
+  return rawAnswer.toString().trim().toLowerCase() === question.correctAnswer.trim().toLowerCase();
 };
 
 const MAX_OFFSET = 42; // % lệch tối đa của nút thắt dây khỏi tâm (50%)
@@ -32,15 +38,14 @@ export default function TugOfWarGame() {
   const [winPulls, setWinPulls] = useState(5);
 
   const [timeLeft, setTimeLeft] = useState(90);
-  const [pool, setPool] = useState([]);
-  const [, setPoolIndex] = useState(0);
-  const [currentQuestion, setCurrentQuestion] = useState(null);
 
+  // Mỗi đội có hàng đợi câu hỏi riêng, làm độc lập với đội kia
+  const [currentQ, setCurrentQ] = useState({ A: null, B: null });
   const [scoreA, setScoreA] = useState(0);
   const [scoreB, setScoreB] = useState(0);
   const [locked, setLocked] = useState({ A: false, B: false });
   const [essayInputs, setEssayInputs] = useState({ A: '', B: '' });
-  const [feedback, setFeedback] = useState(null); // { team, status }
+  const [feedback, setFeedback] = useState({ A: null, B: null }); // 'correct' | 'wrong' | null mỗi đội
   const [winner, setWinner] = useState(null); // 'A' | 'B' | 'draw' | null
 
   const [leanTeam, setLeanTeam] = useState(null);
@@ -49,7 +54,9 @@ export default function TugOfWarGame() {
 
   const scoreARef = useRef(0);
   const scoreBRef = useRef(0);
-  const advanceTimerRef = useRef(null);
+  const poolsRef = useRef({ A: [], B: [] });
+  const qIndexRef = useRef({ A: 0, B: 0 });
+  const advanceTimerRefs = useRef({ A: null, B: null });
 
   useEffect(() => { scoreARef.current = scoreA; }, [scoreA]);
   useEffect(() => { scoreBRef.current = scoreB; }, [scoreB]);
@@ -83,9 +90,13 @@ export default function TugOfWarGame() {
     return () => clearTimeout(id);
   }, [phase, timeLeft, winner]);
 
-  // Dọn dẹp timer chuyển câu khi unmount
+  // Dọn dẹp các timer chuyển câu khi unmount
   useEffect(() => {
-    return () => { if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current); };
+    const timers = advanceTimerRefs.current;
+    return () => {
+      clearTimeout(timers.A);
+      clearTimeout(timers.B);
+    };
   }, []);
 
   const startGame = () => {
@@ -93,15 +104,15 @@ export default function TugOfWarGame() {
       alert('Bộ đề này chưa có câu hỏi nào! Hãy thêm câu hỏi ở Trang quản trị.');
       return;
     }
-    const shuffled = shuffleArray(setData.questions);
-    setPool(shuffled);
-    setPoolIndex(0);
-    setCurrentQuestion(shuffled[0]);
+    const qs = setData.questions;
+    poolsRef.current = { A: shuffleArray(qs), B: shuffleArray(qs) };
+    qIndexRef.current = { A: 0, B: 0 };
+    setCurrentQ({ A: poolsRef.current.A[0], B: poolsRef.current.B[0] });
     setScoreA(0);
     setScoreB(0);
     setLocked({ A: false, B: false });
     setEssayInputs({ A: '', B: '' });
-    setFeedback(null);
+    setFeedback({ A: null, B: null });
     setWinner(null);
     setLeanTeam(null);
     setShakeTeam(null);
@@ -109,29 +120,25 @@ export default function TugOfWarGame() {
     setPhase('playing');
   };
 
-  const goToNextQuestion = () => {
-    setFeedback(null);
-    setLocked({ A: false, B: false });
-    setEssayInputs({ A: '', B: '' });
-
-    setPoolIndex(prevIdx => {
-      let nextIdx = prevIdx + 1;
-      let usePool = pool;
-      if (nextIdx >= pool.length) {
-        usePool = shuffleArray(setData.questions);
-        setPool(usePool);
-        nextIdx = 0;
-      }
-      setCurrentQuestion(usePool[nextIdx]);
-      return nextIdx;
-    });
+  const advanceQuestion = (team) => {
+    const idxObj = qIndexRef.current;
+    let nextIdx = idxObj[team] + 1;
+    let pool = poolsRef.current[team];
+    if (nextIdx >= pool.length) {
+      pool = shuffleArray(setData.questions);
+      poolsRef.current[team] = pool;
+      nextIdx = 0;
+    }
+    idxObj[team] = nextIdx;
+    setCurrentQ(prev => ({ ...prev, [team]: pool[nextIdx] }));
+    setLocked(prev => ({ ...prev, [team]: false }));
+    setEssayInputs(prev => ({ ...prev, [team]: '' }));
+    setFeedback(prev => ({ ...prev, [team]: null }));
   };
 
-  const scheduleNextQuestion = () => {
-    if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
-    advanceTimerRef.current = setTimeout(() => {
-      goToNextQuestion();
-    }, 1400);
+  const scheduleAdvance = (team, delay) => {
+    clearTimeout(advanceTimerRefs.current[team]);
+    advanceTimerRefs.current[team] = setTimeout(() => advanceQuestion(team), delay);
   };
 
   const triggerPull = (team) => {
@@ -145,51 +152,44 @@ export default function TugOfWarGame() {
     setTimeout(() => setShakeTeam(null), 500);
   };
 
-  const checkAnswer = (question, rawAnswer) => {
-    if (question.type === 'multiple_choice') {
-      return rawAnswer === question.correctAnswer;
-    }
-    return rawAnswer.toString().trim().toLowerCase() === question.correctAnswer.trim().toLowerCase();
-  };
-
   const handleSubmitAnswer = (team, rawAnswer) => {
-    if (winner || phase !== 'playing' || locked[team] || !currentQuestion) return;
+    if (winner || phase !== 'playing' || locked[team]) return;
+    const q = currentQ[team];
+    if (!q) return;
     if (!rawAnswer || !rawAnswer.toString().trim()) return;
 
-    const isCorrect = checkAnswer(currentQuestion, rawAnswer);
+    const isCorrect = checkAnswer(q, rawAnswer);
 
     if (isCorrect) {
       const newScoreA = team === 'A' ? scoreA + 1 : scoreA;
       const newScoreB = team === 'B' ? scoreB + 1 : scoreB;
-      setScoreA(newScoreA);
-      setScoreB(newScoreB);
-      setLocked({ A: true, B: true });
-      setFeedback({ team, status: 'correct' });
+      if (team === 'A') setScoreA(newScoreA); else setScoreB(newScoreB);
+      setLocked(prev => ({ ...prev, [team]: true }));
+      setFeedback(prev => ({ ...prev, [team]: 'correct' }));
       triggerPull(team);
 
       const target = Number(winPulls) || 5;
       if (Math.abs(newScoreA - newScoreB) >= target) {
-        if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
+        clearTimeout(advanceTimerRefs.current.A);
+        clearTimeout(advanceTimerRefs.current.B);
         setTimeout(() => {
           setWinner(newScoreA > newScoreB ? 'A' : 'B');
           setPhase('finished');
         }, 900);
       } else {
-        scheduleNextQuestion();
+        scheduleAdvance(team, 1100);
       }
     } else {
-      const nextLocked = { ...locked, [team]: true };
-      setLocked(nextLocked);
-      setFeedback({ team, status: 'wrong' });
+      setLocked(prev => ({ ...prev, [team]: true }));
+      setFeedback(prev => ({ ...prev, [team]: 'wrong' }));
       triggerShake(team);
-      if (nextLocked.A && nextLocked.B) {
-        scheduleNextQuestion();
-      }
+      scheduleAdvance(team, 1600);
     }
   };
 
   const handleRestart = () => {
-    if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
+    clearTimeout(advanceTimerRefs.current.A);
+    clearTimeout(advanceTimerRefs.current.B);
     setPhase('setup');
     setWinner(null);
   };
@@ -213,8 +213,60 @@ export default function TugOfWarGame() {
   const target = Number(winPulls) || 5;
   const offset = Math.max(-MAX_OFFSET, Math.min(MAX_OFFSET, (diff / target) * MAX_OFFSET));
   const knotLeft = 50 - offset; // diff dương -> Đội A (trái) thắng thế -> nút dịch về trái
-
   const ticks = Array.from({ length: target }, (_, i) => i + 1);
+
+  // Render khối câu hỏi + đáp án của 1 đội (dùng chung cho cả 2 panel A/B)
+  const renderTeamBody = (team, question) => (
+    <>
+      <div className="tow-team-question">
+        <span className="tow-qtype-badge">
+          {question.type === 'multiple_choice' ? '🔘 Trắc nghiệm' : '✍️ Tự luận'}
+        </span>
+        <p>{question.question}</p>
+      </div>
+
+      {question.type === 'multiple_choice' ? (
+        <div className="tow-team-options">
+          {question.options.map((opt, i) => (
+            <button
+              key={i}
+              className="tow-option-card"
+              disabled={locked[team] || !!winner}
+              onClick={() => handleSubmitAnswer(team, opt)}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="tow-essay-row">
+          <input
+            className="tow-essay-input"
+            placeholder="Nhập câu trả lời..."
+            value={essayInputs[team]}
+            disabled={locked[team] || !!winner}
+            onChange={e => setEssayInputs(prev => ({ ...prev, [team]: e.target.value }))}
+            onKeyDown={e => e.key === 'Enter' && handleSubmitAnswer(team, essayInputs[team])}
+          />
+          <button
+            className="tow-essay-submit"
+            disabled={locked[team] || !!winner}
+            onClick={() => handleSubmitAnswer(team, essayInputs[team])}
+          >
+            Trả lời
+          </button>
+        </div>
+      )}
+
+      {feedback[team] && (
+        <div className={`tow-team-feedback ${feedback[team]}`}>
+          {feedback[team] === 'correct'
+            ? '✅ Chính xác! Kéo dây 1 bước!'
+            : `❌ Sai rồi! Đáp án: ${question.correctAnswer}`}
+        </div>
+      )}
+    </>
+  );
 
   return (
     <div className="stage tow-stage">
@@ -251,7 +303,8 @@ export default function TugOfWarGame() {
           </div>
 
           <p className="tow-setup-rule">
-            📜 Luật chơi: trả lời đúng câu hỏi sẽ kéo dây về phía đội mình 1 bước. Đội nào kéo lệch <strong>{winPulls}</strong> bước trước sẽ thắng ngay.
+            📜 Luật chơi: Mỗi đội có câu hỏi riêng và trả lời độc lập với đội kia. Trả lời đúng sẽ kéo dây về phía đội mình 1 bước,
+            trả lời sai sẽ chuyển sang câu khác. Đội nào kéo lệch <strong>{winPulls}</strong> bước trước sẽ thắng ngay.
             Nếu hết <strong>{duration}s</strong> mà chưa đội nào thắng, đội đang kéo dây về phía mình nhiều hơn sẽ thắng.
           </p>
 
@@ -262,161 +315,72 @@ export default function TugOfWarGame() {
         </div>
       )}
 
-      {phase === 'playing' && currentQuestion && (
+      {phase === 'playing' && currentQ.A && currentQ.B && (
         <>
-          <div className="tow-topbar">
-            <div className={`pill score tow-pill-a`}><span className="emoji">🔴</span> {teamAName}: {scoreA}</div>
-            <div className={`pill tow-timer-pill ${timeLeft <= 10 ? 'tow-timer-warning' : ''}`}>
+          <div className="tow-topbar-mini">
+            <div className={`tow-timer-pill ${timeLeft <= 10 ? 'tow-timer-warning' : ''}`}>
               <span className="emoji">⏱️</span> {timeLeft}s
             </div>
-            <div className={`pill score tow-pill-b`}><span className="emoji">🔵</span> {teamBName}: {scoreB}</div>
           </div>
 
-          <div className="tow-arena">
-            <div className="tow-end tow-end-a">
-              <div className={`tow-kid-row ${leanTeam === 'A' ? 'tow-group-pull' : ''} ${shakeTeam === 'A' ? 'tow-group-shake' : ''}`}>
-                <TugKid hairStyle="spiky" hair="#231f1a" skin="#ffd9b3" shirt="#f4c430" pants="#3c8a55" shoe="#2c6f4f" />
-                <TugKid hairStyle="curly" hair="#7a4a2b" skin="#ffd9b3" shirt="#4fb6e0" pants="#7c7c86" shoe="#2c6f8e" glasses="#3fae5c" />
-                <TugKid hairStyle="wavy" hair="#c2611a" skin="#ffe0bd" shirt="#f4c430" pants="#3a3a3a" shoe="#7a4a2b" />
+          <div className="tow-duel">
+            {/* ---------- Panel Đội A (trái) ---------- */}
+            <div className={`tow-team-panel tow-team-panel-a ${shakeTeam === 'A' ? 'tow-team-shake' : ''} ${locked.A ? 'tow-locked' : ''}`}>
+              <div className="tow-team-panel-header">
+                <span className="tow-team-avatar">🙂</span>
+                <span className="tow-team-panel-name">{teamAName}</span>
+                <span className="tow-team-panel-score">{scoreA}</span>
               </div>
-              <div className="tow-end-label">{teamAName}</div>
+              {renderTeamBody('A', currentQ.A)}
             </div>
 
-            <div className="tow-track">
-              {ticks.map(i => (
-                <div key={`ta-${i}`} className="tow-tick" style={{ left: `${50 - (i / target) * MAX_OFFSET}%` }} />
-              ))}
-              {ticks.map(i => (
-                <div key={`tb-${i}`} className="tow-tick" style={{ left: `${50 + (i / target) * MAX_OFFSET}%` }} />
-              ))}
-              <div className="tow-center-line" />
-              <div className="tow-rope-line" />
-              <div className={`tow-knot ${leanTeam ? 'tow-knot-pulling' : ''}`} style={{ left: `${knotLeft}%` }}>🎀</div>
-            </div>
+            {/* ---------- Dải kéo co ở giữa (ảnh thật, không phải SVG) ---------- */}
+            <div className="tow-center-col">
+              <div className="tow-arena">
+                <div className={`tow-end tow-end-a ${leanTeam === 'A' ? 'tow-group-pull' : ''} ${shakeTeam === 'A' ? 'tow-group-shake' : ''}`}>
+                  <img src="/tow-team-left.png" alt={teamAName} className="tow-kid-photo" />
+                </div>
 
-            <div className="tow-end tow-end-b">
-              <div className={`tow-kid-row tow-mirror ${leanTeam === 'B' ? 'tow-group-pull' : ''} ${shakeTeam === 'B' ? 'tow-group-shake' : ''}`}>
-                <TugKid hairStyle="headband" hair="#5b3a22" headband="#3fa66a" skin="#ffd9b3" shirt="#3fae5c" pants="#c0392b" shoe="#1f3b57" />
-                <TugKid hairStyle="shortcurl" hair="#1c1c1c" skin="#ffd9b3" shirt="#8b2e3a" pants="#1f3b57" shoe="#111111" glasses="#d23c3c" />
-                <TugKid hairStyle="pigtail" hair="#f1c233" skin="#ffe0bd" shirt="#d23c3c" pants="#2e7d52" shoe="#d23c3c" />
-              </div>
-              <div className="tow-end-label">{teamBName}</div>
-            </div>
+                <div className="tow-track">
+                  {ticks.map(i => (
+                    <div key={`ta-${i}`} className="tow-tick" style={{ left: `${50 - (i / target) * MAX_OFFSET}%` }} />
+                  ))}
+                  {ticks.map(i => (
+                    <div key={`tb-${i}`} className="tow-tick" style={{ left: `${50 + (i / target) * MAX_OFFSET}%` }} />
+                  ))}
+                  <div className="tow-center-line" />
+                  <div className="tow-rope-line" />
+                  <img
+                    src="/tow-ribbon.png"
+                    alt="ruy băng"
+                    className={`tow-knot ${leanTeam ? 'tow-knot-pulling' : ''}`}
+                    style={{ left: `${knotLeft}%` }}
+                  />
+                </div>
 
-            {pullPopKey.A > 0 && (
-              <span key={`popA-${pullPopKey.A}`} className="tow-pop tow-pop-a">+1</span>
-            )}
-            {pullPopKey.B > 0 && (
-              <span key={`popB-${pullPopKey.B}`} className="tow-pop tow-pop-b">+1</span>
-            )}
-          </div>
+                <div className={`tow-end tow-end-b ${leanTeam === 'B' ? 'tow-group-pull' : ''} ${shakeTeam === 'B' ? 'tow-group-shake' : ''}`}>
+                  <img src="/tow-team-right.png" alt={teamBName} className="tow-kid-photo" />
+                </div>
 
-          <div className="tow-question-card">
-            <span className="tow-qtype-badge">
-              {currentQuestion.type === 'multiple_choice' ? '🔘 Trắc nghiệm' : '✍️ Tự luận'}
-            </span>
-            <h3>{currentQuestion.question}</h3>
-          </div>
-
-          <div className="tow-panels">
-            {/* Đội A */}
-            <div className={`tow-panel tow-panel-a ${shakeTeam === 'A' ? 'tow-shake' : ''} ${locked.A ? 'tow-locked' : ''}`}>
-              <div className="tow-panel-header">
-                <span className="tow-panel-team">🔴 {teamAName}</span>
-                {feedback?.team === 'A' && (
-                  <span className={`tow-panel-status ${feedback.status}`}>
-                    {feedback.status === 'correct' ? '✅ Chính xác!' : '❌ Sai rồi'}
-                  </span>
+                {pullPopKey.A > 0 && (
+                  <span key={`popA-${pullPopKey.A}`} className="tow-pop tow-pop-a">+1</span>
+                )}
+                {pullPopKey.B > 0 && (
+                  <span key={`popB-${pullPopKey.B}`} className="tow-pop tow-pop-b">+1</span>
                 )}
               </div>
-
-              {currentQuestion.type === 'multiple_choice' ? (
-                <div className="tow-options">
-                  {currentQuestion.options.map((opt, i) => (
-                    <button
-                      key={i}
-                      className="tow-option-btn tow-option-a"
-                      disabled={locked.A || !!winner}
-                      onClick={() => handleSubmitAnswer('A', opt)}
-                    >
-                      {opt}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="tow-essay-row">
-                  <input
-                    className="tow-essay-input"
-                    placeholder="Nhập câu trả lời..."
-                    value={essayInputs.A}
-                    disabled={locked.A || !!winner}
-                    onChange={e => setEssayInputs(prev => ({ ...prev, A: e.target.value }))}
-                    onKeyDown={e => e.key === 'Enter' && handleSubmitAnswer('A', essayInputs.A)}
-                  />
-                  <button
-                    className="tow-essay-submit tow-essay-submit-a"
-                    disabled={locked.A || !!winner}
-                    onClick={() => handleSubmitAnswer('A', essayInputs.A)}
-                  >
-                    Trả lời
-                  </button>
-                </div>
-              )}
             </div>
 
-            {/* Đội B */}
-            <div className={`tow-panel tow-panel-b ${shakeTeam === 'B' ? 'tow-shake' : ''} ${locked.B ? 'tow-locked' : ''}`}>
-              <div className="tow-panel-header">
-                <span className="tow-panel-team">🔵 {teamBName}</span>
-                {feedback?.team === 'B' && (
-                  <span className={`tow-panel-status ${feedback.status}`}>
-                    {feedback.status === 'correct' ? '✅ Chính xác!' : '❌ Sai rồi'}
-                  </span>
-                )}
+            {/* ---------- Panel Đội B (phải) ---------- */}
+            <div className={`tow-team-panel tow-team-panel-b ${shakeTeam === 'B' ? 'tow-team-shake' : ''} ${locked.B ? 'tow-locked' : ''}`}>
+              <div className="tow-team-panel-header">
+                <span className="tow-team-panel-score">{scoreB}</span>
+                <span className="tow-team-panel-name">{teamBName}</span>
+                <span className="tow-team-avatar">🙂</span>
               </div>
-
-              {currentQuestion.type === 'multiple_choice' ? (
-                <div className="tow-options">
-                  {currentQuestion.options.map((opt, i) => (
-                    <button
-                      key={i}
-                      className="tow-option-btn tow-option-b"
-                      disabled={locked.B || !!winner}
-                      onClick={() => handleSubmitAnswer('B', opt)}
-                    >
-                      {opt}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="tow-essay-row">
-                  <input
-                    className="tow-essay-input"
-                    placeholder="Nhập câu trả lời..."
-                    value={essayInputs.B}
-                    disabled={locked.B || !!winner}
-                    onChange={e => setEssayInputs(prev => ({ ...prev, B: e.target.value }))}
-                    onKeyDown={e => e.key === 'Enter' && handleSubmitAnswer('B', essayInputs.B)}
-                  />
-                  <button
-                    className="tow-essay-submit tow-essay-submit-b"
-                    disabled={locked.B || !!winner}
-                    onClick={() => handleSubmitAnswer('B', essayInputs.B)}
-                  >
-                    Trả lời
-                  </button>
-                </div>
-              )}
+              {renderTeamBody('B', currentQ.B)}
             </div>
           </div>
-
-          {feedback && (
-            <div className={`tow-feedback ${feedback.status === 'correct' ? 'correct' : 'incorrect'}`}>
-              {feedback.status === 'correct'
-                ? `🎉 ${feedback.team === 'A' ? teamAName : teamBName} trả lời đúng, kéo dây 1 bước!`
-                : `❌ ${feedback.team === 'A' ? teamAName : teamBName} trả lời sai!${locked.A && locked.B ? ' Cả hai đội đều sai, sang câu khác...' : ''}`}
-            </div>
-          )}
         </>
       )}
 
